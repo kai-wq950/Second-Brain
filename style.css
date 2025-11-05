@@ -1,0 +1,892 @@
+/*
+ * Global styles for the Second Brain app.
+ *
+ * This file defines color variables and reusable component classes to
+ * achieve a glassmorphic look. Variables change depending on the
+ * current theme (light or dark). A simple media query switches
+ * the navigation from a bottom bar on small screens to a left
+ * sidebar on larger screens.
+ */
+
+/* Default (light) theme variables */
+:root {
+    /* Page background gradient (light mode).
+     * Use a subtle radial gradient with a warm tint inspired by the
+     * reference mock‑ups.  A soft orange focal point fades into a
+     * neutral off‑white.  This adds depth while retaining a clean
+     * light look. */
+    --bg-gradient: radial-gradient(circle at 50% 30%, rgba(255, 164, 116, 0.5), rgba(252, 244, 237, 1) 60%, rgba(248, 251, 252, 1) 100%);
+    /* Base text colour */
+    --text-color: #1a1a1a;
+    /* Accent colour used for highlights */
+    --accent-color: #f2795c;
+
+    /* Gradient tints derived from the accent colour.
+     * These variables are updated via JavaScript to create
+     * harmonious gradients for the dashboard cards.  Each one
+     * represents the accent colour mixed with white at different
+     * strengths.  Defaults are calculated manually for the default
+     * accent (#f2795c) but will be overwritten when the user
+     * selects a custom accent on the settings page. */
+    --gradient-1: #f6a18c; /* accent mixed ~30% with white */
+    --gradient-2: #fbbcac; /* accent mixed ~50% with white */
+    --gradient-3: #fbd6ce; /* accent mixed ~70% with white */
+    --gradient-4: #fbe8e3; /* accent mixed ~85% with white */
+
+    /* Keep section accent as a simple alias to accent colour.
+     * All components now reference --accent-color directly or via
+     * these gradient variables, ensuring a unified colour theme. */
+    --section-accent: var(--accent-color);
+    /* Glass panel background (light) */
+    --panel-bg: rgba(255, 255, 255, 0.45);
+    /* Border colour for panels */
+    --panel-border: rgba(255, 255, 255, 0.6);
+    /* Box shadow for panels */
+    --panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* --------------------------------------------------------------------------
+ * Font imports
+ * Import modern fonts from Google Fonts for a polished look.  Poppins is
+ * used for headings and Inter for body text.  Including the fonts here
+ * allows all pages to share them without adding extra <link> tags in
+ * individual HTML files.  See https://fonts.google.com for license
+ * details.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;700&family=Playfair+Display:wght@400;600;700&display=swap');
+
+/* Font variables */
+:root {
+    --font-heading: 'Poppins', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    /* Display font used for large hero headings and taglines */
+    --font-display: 'Playfair Display', serif;
+
+    /* Pastel backgrounds for finance summary cards (light mode) */
+    --income-bg: #e7f5f5;
+    --expense-bg: #fce8e8;
+    --net-bg: #faf0d4;
+}
+
+/* Dark theme overrides */
+[data-theme="dark"] {
+    /* Dark mode background: a deep radial gradient with a warm orange core
+     * fading into near‑black, reminiscent of the reference hero image.
+     * This lends the interface a cinematic, professional feel. */
+    --bg-gradient: radial-gradient(circle at 50% 25%, rgba(248, 104, 69, 0.4), rgba(19, 25, 30, 0.9) 60%, rgba(10, 15, 20, 1) 100%);
+    --text-color: #f2f4f8;
+    --accent-color: #ff945e;
+    --panel-bg: rgba(32, 36, 41, 0.6);
+    --panel-border: rgba(255, 255, 255, 0.15);
+    --panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+    /* Dark mode backgrounds for finance summary cards
+     * Use slightly lighter pastel tints to ensure the cards stand out
+     * against the dark backdrop while preserving contrast. */
+    --income-bg: rgba(56, 96, 92, 0.6);
+    --expense-bg: rgba(96, 56, 56, 0.6);
+    --net-bg: rgba(96, 85, 40, 0.6);
+}
+
+/* Remove per-page accent overrides to maintain a uniform accent colour across
+ * the entire application.  The --section-accent will now simply inherit
+ * --accent-color defined in :root, providing a consistent visual theme. */
+
+/* Reset some basic styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    /* Use the Inter font for body text by default */
+    font-family: var(--font-body);
+    background: var(--bg-gradient);
+    color: var(--text-color);
+    transition: background 0.4s ease, color 0.4s ease;
+    padding-bottom: 80px; /* space for mobile nav */
+}
+
+/* Container for main content on each page */
+.content-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Reusable glass panel style */
+.glass-card {
+    background: var(--panel-bg);
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+    border: 1px solid var(--panel-border);
+    border-radius: 1.25rem;
+    /* Increase shadow for a more pronounced floating feel */
+    box-shadow: var(--panel-shadow);
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+
+    /* Apply a subtle entrance animation and hover effect */
+    animation: fadeInUp 0.6s ease-out both;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Micro‑interactions: lift cards on hover */
+.glass-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* Nav item hover effect (non‑active) */
+.navbar .nav-item:not(.active):hover {
+    transform: translateY(-2px);
+    color: var(--section-accent);
+}
+
+/* Headings */
+h1 {
+    font-size: 2.4rem;
+    margin-bottom: 1.5rem;
+    font-family: var(--font-heading);
+}
+
+h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0.75rem;
+    font-family: var(--font-heading);
+}
+
+h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-heading);
+}
+
+/* Navigation bar styles */
+.navbar {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    width: calc(100% - 2rem);
+    max-width: 600px;
+    background: var(--panel-bg);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border: 1px solid var(--panel-border);
+    border-radius: 3rem;
+    /* Increase shadow for nav bar to elevate it visually */
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+}
+
+/* --------------------------------------------------------------------------
+ * Top bar styles
+ * A universal top bar appears at the top of each page, providing a search
+ * input and a user avatar.  It uses the same glassy treatment as
+ * panels and adjusts spacing responsively.  The avatar inherits
+ * the current section's accent colour to personalise the experience.
+ */
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0.75rem 1rem;
+    margin-bottom: 2rem;
+    background: var(--panel-bg);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border: 1px solid var(--panel-border);
+    border-radius: 1.5rem;
+    box-shadow: var(--panel-shadow);
+}
+
+.top-bar .search-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 1rem;
+    padding: 0.5rem 0.75rem;
+    box-shadow: var(--panel-shadow);
+    margin-right: 1rem;
+}
+
+.search-container .search-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.5rem;
+    opacity: 0.8;
+}
+
+.top-bar input[type="text"] {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.top-bar .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    background: var(--section-accent);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+@media (max-width: 767px) {
+    .top-bar {
+        flex-direction: row;
+        padding: 0.5rem 0.75rem;
+    }
+    .top-bar .search-container {
+        margin-right: 0.5rem;
+        padding: 0.4rem 0.6rem;
+    }
+    .top-bar .avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Card header with icon */
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.card-header svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+.navbar .nav-item {
+    flex: 1;
+    text-align: center;
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 0.5rem 0.25rem;
+    border-radius: 1.75rem;
+    transition: color 0.3s ease, background 0.3s ease, transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.75rem;
+}
+
+.navbar .nav-item svg {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 0.25rem;
+    fill: currentColor;
+    stroke: none;
+}
+
+.navbar .nav-item.active {
+    /* Highlight the active item with the current section accent */
+    color: #ffffff;
+    background: var(--section-accent);
+}
+
+/* --------------------------------------------------------------------------
+ * Hero section styles
+ * Create a split layout for the hero section with a large headline and
+ * supporting copy on one side and an illustration on the other.  The
+ * headings use the display font to evoke an editorial, personable feel.
+ */
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 2rem;
+
+    /* Position context for decorative shape */
+    position: relative;
+    overflow: hidden;
+}
+
+    /* Decorative halo behind hero content
+     * A very subtle white glow is used behind hero content to add
+     * depth without introducing per‑page colours.  It creates a soft
+     * backdrop that doesn’t distract from the main content. */
+.hero::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    /* Subtle glow: white at centre fading to transparent */
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+    opacity: 0.12;
+    filter: blur(100px);
+    z-index: -1;
+    transform: none;
+}
+
+.hero-text {
+    flex: 1 1 300px;
+    max-width: 600px;
+}
+
+.hero-text h1 {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    line-height: 1.1;
+    margin-bottom: 0.75rem;
+}
+
+.hero-text h2 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.hero-text p {
+    font-size: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.hero-image {
+    flex: 1 1 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 1.5rem;
+}
+
+@media (max-width: 767px) {
+    .hero {
+        flex-direction: column;
+    }
+    .hero-text h1 {
+        font-size: 2.2rem;
+    }
+}
+
+/* --------------------------------------------------------------------------
+ * Statistics grid for finance summary (three cards with pastel backgrounds)
+ */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.stat-card {
+    padding: 1rem 1.5rem;
+    border-radius: 1rem;
+    color: var(--text-color);
+    box-shadow: var(--panel-shadow);
+    backdrop-filter: blur(10px) saturate(150%);
+    -webkit-backdrop-filter: blur(10px) saturate(150%);
+    border: 1px solid var(--panel-border);
+}
+
+.stat-card h4 {
+    margin-bottom: 0.3rem;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.stat-card p {
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.stat-income {
+    background: var(--income-bg);
+}
+
+.stat-expense {
+    background: var(--expense-bg);
+}
+
+.stat-net {
+    background: var(--net-bg);
+}
+
+/* --------------------------------------------------------------------------
+ * Summary grid for home page
+ *
+ * Lay out the summary cards in a responsive grid that automatically
+ * adjusts based on available width.  Each card will occupy equal
+ * width across the row, and the grid will wrap as needed.  This
+ * avoids imposing different layouts per page and promotes a
+ * consistent, balanced look.
+ */
+.stats-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* --------------------------------------------------------------------------
+ * World clock styles
+ *
+ * Inspired by the world‑time dashboard you referenced, the world clock
+ * combines a large digital time display with secondary city times.
+ * A subtle grid pattern is applied to the background using CSS
+ * gradients.  Typography is scaled up for the digital display and
+ * monospace numerals ensure consistent character widths.
+ */
+.world-clock {
+    position: relative;
+    overflow: hidden;
+    background: var(--panel-bg);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    border: 1px solid var(--panel-border);
+    border-radius: 1.25rem;
+    padding: 2rem;
+    margin-top: 2rem;
+    /* Apply gridlines via repeating background gradients */
+    background-image: linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);
+    background-size: 2rem 2rem;
+}
+
+.digital-clock {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: clamp(2rem, 8vw, 5rem);
+    letter-spacing: -0.05em;
+    text-align: left;
+    margin-bottom: 1rem;
+    line-height: 1;
+    position: relative;
+}
+
+/* Container for the row of city times */
+.world-time-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+}
+.city-time {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1 1 120px;
+}
+
+.city-time .city {
+    font-size: 0.8rem;
+    font-weight: 500;
+    opacity: 0.7;
+}
+
+.city-time .time {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* Accent utility class
+ * Use this class on inline elements to colour them with the
+ * current section accent.  Great for highlighting keywords in
+ * headings or calls to action. */
+.accent {
+    color: var(--section-accent);
+}
+
+/* --------------------------------------------------------------------------
+ * Progress bar styles
+ */
+.progress-container {
+    width: 100%;
+    height: 0.6rem;
+    background: var(--panel-border);
+    border-radius: 0.3rem;
+    overflow: hidden;
+    margin-top: 0.75rem;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--section-accent);
+    transition: width 0.5s ease;
+    border-radius: 0.3rem;
+}
+
+/* --------------------------------------------------------------------------
+ * Project colour variations
+ * Assign soft pastel backgrounds to project cards to inject personality
+ * and variety.  The alpha channel keeps the cards translucent.
+ */
+.project-color-0 { background: rgba(255, 243, 205, 0.7); }
+.project-color-1 { background: rgba(224, 242, 241, 0.7); }
+.project-color-2 { background: rgba(255, 227, 227, 0.7); }
+.project-color-3 { background: rgba(245, 235, 246, 0.7); }
+.project-color-4 { background: rgba(230, 244, 207, 0.7); }
+
+/* Ensure text inside project cards is readable on pastel backgrounds */
+.project-card h3 {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.project-card ul {
+    margin-top: 0.5rem;
+}
+
+
+/* Buttons and inputs */
+button, input[type="text"], input[type="number"], input[type="date"], select {
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    background: var(--panel-bg);
+    color: var(--text-color);
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%);
+    box-shadow: var(--panel-shadow);
+    margin-bottom: 0.75rem;
+    width: 100%;
+}
+
+button:hover {
+    cursor: pointer;
+    background: rgba(255,255,255,0.5);
+}
+
+/* Primary buttons and links
+ * The .primary class can be applied to buttons or anchor tags.  It uses
+ * the accent colour and white text.  Hovering slightly dims the element. */
+.primary {
+    background: var(--section-accent);
+    color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    text-decoration: none;
+    display: inline-block;
+    transition: opacity 0.3s ease;
+}
+.primary:hover {
+    cursor: pointer;
+    opacity: 0.9;
+}
+
+/* List styles */
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Dashboard statistics grid definition moved earlier and replaced by bento layout.
+   The previous responsive definition has been removed to avoid conflicts. */
+
+li.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem;
+    background: var(--panel-bg);
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%);
+    border: 1px solid var(--panel-border);
+}
+
+li.task-item.completed {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+/* Small delete buttons used for removing items within lists (timetable
+   tasks, calendar events, etc.).  These buttons are unobtrusive by
+   default but highlight on hover to indicate interactivity. */
+.delete-icon {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-left: 0.5rem;
+    padding: 0;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.2s ease, color 0.2s ease;
+}
+.delete-icon:hover {
+    opacity: 1;
+    color: var(--section-accent);
+}
+
+/* Finance list */
+.finance-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.finance-table thead th {
+    text-align: left;
+    padding: 0.5rem;
+}
+
+.finance-table tbody td {
+    padding: 0.5rem;
+    border-top: 1px solid var(--panel-border);
+}
+
+.income {
+    color: #28a745;
+}
+
+.expense {
+    color: #dc3545;
+}
+
+/* Calendar grid */
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
+}
+
+/* --------------------------------------------------------------------------
+ * Note cards styles
+ * Use the existing glass-card class for notes, but adjust internal spacing
+ * and typography to suit blocks of text.  Notes will stack with a small
+ * margin between them.
+ */
+.note-card {
+    margin-bottom: 1rem;
+}
+.note-card h4 {
+    margin-bottom: 0.5rem;
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+}
+.note-card p {
+    white-space: pre-wrap;
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+.calendar-header, .calendar-day {
+    padding: 0.5rem;
+    text-align: center;
+    border-radius: 0.5rem;
+    background: var(--panel-bg);
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%);
+    border: 1px solid var(--panel-border);
+}
+
+.calendar-day {
+    min-height: 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    font-size: 0.9rem;
+    position: relative;
+}
+
+.calendar-day .day-number {
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.calendar-day .events {
+    font-size: 0.75rem;
+    line-height: 1.1;
+    overflow-y: auto;
+    max-height: 2.5rem;
+    width: 100%;
+}
+
+/* Individual calendar events displayed inside a calendar day.  These
+   elements are clickable for deletion; they have a subtle hover
+   effect and inherit the accent colour on hover. */
+.calendar-event {
+    cursor: pointer;
+    opacity: 0.85;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+.calendar-event:hover {
+    opacity: 1;
+    color: var(--section-accent);
+}
+
+/* Timetable grid */
+.timetable {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.5rem;
+}
+
+.timetable-day {
+    display: flex;
+    flex-direction: column;
+    border-radius: 0.5rem;
+    background: var(--panel-bg);
+    backdrop-filter: blur(8px) saturate(180%);
+    -webkit-backdrop-filter: blur(8px) saturate(180%);
+    border: 1px solid var(--panel-border);
+    padding: 0.5rem;
+}
+
+.timetable-day header {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.timetable-day ul {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.timetable-day .add-item {
+    margin-top: 0.5rem;
+    text-align: right;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: var(--section-accent);
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+    h1 {
+        font-size: 1.75rem;
+    }
+    h2 {
+        font-size: 1.25rem;
+    }
+}
+
+/* --------------------------------------------------------------------------
+ * Animations and interactive effects
+ * Provide subtle micro‑interactions to enhance the user experience without
+ * overwhelming the interface. Animations follow modern design guidance:
+ * they are short, easing out and only draw attention to interactive
+ * elements【989074381740864†L139-L156】.  Cards fade and slide in as they appear,
+ * and hover states create a sense of depth.
+ */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.navbar .nav-item {
+    transition: color 0.3s ease, background 0.3s ease, transform 0.2s ease;
+}
+
+.navbar .nav-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Hover effect for panels */
+.glass-card:hover {
+    /* Add a slight 3D tilt on hover for more personality */
+    transform: translateY(-6px) rotateX(-2deg) rotateY(1deg);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* Focus styles for inputs and buttons */
+button, input[type="text"], input[type="number"], input[type="date"], select {
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Focus styles: remove outlines and highlight focused controls with the accent */
+button:focus,
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--section-accent);
+}
+
+/* --------------------------------------------------------------------------
+ * Gradient cards for the home summary
+ * Inspired by contemporary Dribbble designs, these cards use gentle
+ * gradients and generous curves to create a distinctive look.  Each
+ * card overlays a coloured gradient via a pseudo‑element, while
+ * preserving the underlying glass effect.  Adjust opacity to taste.
+ */
+.gradient-card {
+    position: relative;
+    border-radius: 1.5rem;
+    overflow: hidden;
+}
+
+.gradient-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.4;
+    pointer-events: none;
+    background: var(--section-accent);
+    mix-blend-mode: normal;
+}
+
+/* Dashboard cards use the accent colour and its lightened tints to
+ * create gentle gradients.  These are updated dynamically in
+ * JavaScript via CSS variables.  The default gradients assume
+ * the accent colour defined in :root. */
+.gradient-card-0::after {
+    background: linear-gradient(45deg, var(--accent-color), var(--gradient-1));
+}
+.gradient-card-1::after {
+    background: linear-gradient(45deg, var(--accent-color), var(--gradient-2));
+}
+.gradient-card-2::after {
+    background: linear-gradient(45deg, var(--accent-color), var(--gradient-3));
+}
+.gradient-card-3::after {
+    background: linear-gradient(45deg, var(--accent-color), var(--gradient-4));
+}
